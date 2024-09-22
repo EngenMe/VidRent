@@ -3,8 +3,8 @@ const Joi = require('joi');
 const express = require('express');
 const router = express.Router();
 
-const Genre = mongoose.model(
-  'Genre',
+const Customer = mongoose.model(
+  'Customer',
   new mongoose.Schema({
     name: {
       type: String,
@@ -14,10 +14,24 @@ const Genre = mongoose.model(
       trim: true,
       unique: true,
     },
+    phone: {
+      type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 15,
+      match: [
+        /^\+?[0-9]{10,15}$/,
+        'Phone number is invalid. It must contain only digits and may start with a +.',
+      ],
+    },
+    isGold: {
+      type: Boolean,
+      default: false,
+    },
   })
 );
 
-function validateGenre(genre) {
+function validateCustomer(customer) {
   const schema = Joi.object({
     name: Joi.string().min(3).max(100).required(),
     phone: Joi.string()
@@ -29,36 +43,34 @@ function validateGenre(genre) {
         'string.pattern.base':
           'Phone number is invalid. It must contain only digits and may start with a +.',
       }),
+    isGold: Joi.boolean(),
   });
 
-  return schema.validate(genre);
+  return schema.validate(customer);
 }
 
 router.get('/', async (req, res) => {
-  const genres = await Genre.find().sort({ name: 1 });
-  res.send(genres);
+  const customer = await Customer.find().sort({ name: 1 });
+  res.send(customer);
 });
 
 router.get('/:id', async (req, res) => {
   try {
-    const genre = await Genre.findById(req.params.id);
-    res.send(genre);
+    const customer = await Customer.findById(req.params.id);
+    res.send(customer);
   } catch (err) {
     res.status(404).send(err.message);
   }
 });
 
 router.post('/', async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validateCustomer(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-
-  let newGenre = new Genre({
-    name: req.body.name,
-  });
+  let newCustomer = new Customer(req.body);
 
   try {
-    await newGenre.validate();
-    const result = await newGenre.save();
+    await newCustomer.validate();
+    const result = await newCustomer.save();
     res.send(result);
   } catch (err) {
     res.status(400).send(err.message);
@@ -66,16 +78,16 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/:id', async (req, res) => {
-  const { error } = validateGenre(req.body);
+  const { error } = validateCustomer(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   try {
-    const updatedGenre = await Genre.findByIdAndUpdate(
+    const updatedCustomer = await Customer.findByIdAndUpdate(
       req.params.id,
       { name: req.body.name },
       { new: true }
     );
-    res.send(updatedGenre);
+    res.send(updatedCustomer);
   } catch (err) {
     res.status(404).send(err.message);
   }
@@ -83,12 +95,14 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedGenre = await Genre.findByIdAndDelete(req.params.id);
+    const deletedCustomer = await Customer.findByIdAndDelete(req.params.id);
 
-    if (!deletedGenre)
-      return res.status(404).send(`Genre with ID=${req.params.id} not found!`);
+    if (!deletedCustomer)
+      return res
+        .status(404)
+        .send(`Customer with ID=${req.params.id} not found!`);
 
-    res.send(deletedGenre);
+    res.send(deletedCustomer);
   } catch (err) {
     res.status(404).send(err.message);
   }
