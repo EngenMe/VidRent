@@ -5,11 +5,14 @@ const genres = require('./routes/genres');
 const customers = require('./routes/customers');
 const movies = require('./routes/movies');
 const rentals = require('./routes/rentals');
+const Fawn = require('fawn');
 
 mongoose
   .connect('mongodb://localhost/vidly')
   .then(() => console.log('DB connected successfully...'))
   .catch((err) => console.error('Failed to connect!'));
+
+Fawn.init(mongoose);
 
 app.use(express.json());
 
