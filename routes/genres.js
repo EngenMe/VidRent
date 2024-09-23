@@ -1,6 +1,7 @@
 const { Genre, validate } = require('../models/genre');
 const express = require('express');
 const router = express.Router();
+const _ = require('lodash');
 
 router.get('/', async (req, res) => {
   const genres = await Genre.find().sort({ name: 1 });
@@ -20,7 +21,7 @@ router.post('/', async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const newGenre = new Genre(req.body);
+  const newGenre = new Movie(_.pick(req.body, ['name']));
 
   try {
     await newGenre.validate();

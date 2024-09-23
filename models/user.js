@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
+const passwordComplexity = require('joi-password-complexity');
 
 const User = mongoose.model(
   'User',
@@ -27,6 +28,16 @@ const User = mongoose.model(
   })
 );
 
+const complexityOptions = {
+  min: 8,
+  max: 1024,
+  lowerCase: 1,
+  upperCase: 1,
+  numeric: 1,
+  symbol: 1,
+  requirementCount: 4
+};
+
 function validateUser(user) {
   const schema = Joi.object({
     name: Joi.string().min(3).max(50).trim().required().messages({
@@ -50,12 +61,15 @@ function validateUser(user) {
         'string.max': `"email" should have a maximum length of {#limit}`,
         'any.required': `"email" is a required field`
       }),
-    password: Joi.string().min(8).max(1024).required().messages({
+    password: passwordComplexity(complexityOptions).required().messages({
       'string.base': `"password" should be a type of 'text'`,
       'string.empty': `"password" cannot be an empty field`,
-      'string.min': `"password" should have a minimum length of {#limit}`,
-      'string.max': `"password" should have a maximum length of {#limit}`,
-      'any.required': `"password" is a required field`
+      'passwordComplexity.tooShort': `"password" should have a minimum length of {#limit}`,
+      'passwordComplexity.tooLong': `"password" should have a maximum length of {#limit}`,
+      'passwordComplexity.lowercase': `"password" should contain at least {#min} lowercase letter`,
+      'passwordComplexity.uppercase': `"password" should contain at least {#min} uppercase letter`,
+      'passwordComplexity.numeric': `"password" should contain at least {#min} number`,
+      'passwordComplexity.symbol': `"password" should contain at least {#min} special character`
     })
   });
 

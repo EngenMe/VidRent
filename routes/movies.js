@@ -2,6 +2,7 @@ const { Genre } = require('../models/genre');
 const { Movie, validate } = require('../models/movie');
 const express = require('express');
 const router = express.Router();
+const _ = require('lodash');
 
 router.get('/', async (req, res) => {
   const movies = await Movie.find().sort({ title: 1 });
@@ -25,13 +26,11 @@ router.post('/', async (req, res) => {
   if (!genre) return res.status(400).send('Invalid genre.');
 
   const movie = new Movie({
-    title: req.body.title,
+    ..._.pick(req.body, ['title', 'numberInStock', 'dailyRentalRate']),
     genre: {
       _id: genre._id,
       name: genre.name
-    },
-    numberInStock: req.body.numberInStock,
-    dailyRentalRate: req.body.dailyRentalRate
+    }
   });
 
   try {

@@ -1,6 +1,7 @@
 const { Customer, validate } = require('../models/customer');
 const express = require('express');
 const router = express.Router();
+const _ = require('lodash');
 
 router.get('/', async (req, res) => {
   const customer = await Customer.find().sort({ name: 1 });
@@ -20,7 +21,9 @@ router.post('/', async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const newCustomer = new Customer(req.body);
+  const newCustomer = new Customer(
+    _.pick(req.body, ['name', 'phone', 'isGold'])
+  );
 
   try {
     await newCustomer.validate();
@@ -40,7 +43,7 @@ router.put('/:id', async (req, res) => {
     {
       name: req.body.name,
       isGold: req.body.isGold,
-      phone: req.body.phone,
+      phone: req.body.phone
     },
     { new: true }
   );
