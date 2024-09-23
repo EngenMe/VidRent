@@ -10,7 +10,6 @@ const Customer = mongoose.model(
       minlength: 3,
       maxlength: 100,
       trim: true,
-      unique: true,
     },
     phone: {
       type: String,
