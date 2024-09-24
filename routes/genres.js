@@ -2,6 +2,7 @@ const { Genre, validate } = require('../models/genre');
 const express = require('express');
 const router = express.Router();
 const _ = require('lodash');
+const auth = require('../middlewares/auth');
 
 router.get('/', async (req, res) => {
   const genres = await Genre.find().sort({ name: 1 });
@@ -17,22 +18,22 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const newGenre = new Movie(_.pick(req.body, ['name']));
+  const genre = new Genre(_.pick(req.body, ['name']));
 
   try {
-    await newGenre.validate();
-    await newGenre.save();
-    res.send(newGenre);
+    await genre.validate();
+    await genre.save();
+    res.send(genre);
   } catch (err) {
     res.status(400).send(err.message);
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -48,7 +49,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     const deletedGenre = await Genre.findByIdAndDelete(req.params.id);
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
 const Fawn = require('fawn');
+const auth = require('../middlewares/auth');
 
 const { Rental, validate } = require('../models/rental');
 const { Customer } = require('../models/customer');
@@ -21,7 +21,7 @@ router.get('/:id', async (req, res) => {
   res.send(rental);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -38,13 +38,13 @@ router.post('/', async (req, res) => {
       _id: customer._id,
       name: customer.name,
       phone: customer.phone,
-      isGold: customer.isGold,
+      isGold: customer.isGold
     },
     movie: {
       _id: movie._id,
       title: movie.title,
-      dailyRentalRate: movie.dailyRentalRate,
-    },
+      dailyRentalRate: movie.dailyRentalRate
+    }
   });
 
   try {
@@ -54,7 +54,7 @@ router.post('/', async (req, res) => {
         'movies',
         { _id: movie._id },
         {
-          $inc: { numberInStock: -1 },
+          $inc: { numberInStock: -1 }
         }
       )
       .run();
