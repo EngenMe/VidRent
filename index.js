@@ -1,3 +1,5 @@
+require('express-async-errors');
+const error = require('./middlewares/error');
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
@@ -11,11 +13,19 @@ Joi.objectId = require('joi-objectid')(Joi);
 const users = require('./routes/users');
 const auth = require('./routes/auth');
 const config = require('config');
+const winston = require('winston');
+
+process.on('uncaughtException', ex => {
+  console.log('WE GOT AN UNCAUGHT EXCEPTION !');
+  winston.error(ex.message, ex);
+});
 
 if (!config.get('jwtPrivateKey')) {
   console.error('FATAL ERROR: jwtPrivateKey is not defined!');
   process.exit(1);
 }
+
+throw new Error('Something went wrong on starting!');
 
 mongoose
   .connect('mongodb://localhost/vidly')
@@ -32,6 +42,8 @@ app.use('/api/movies', movies);
 app.use('/api/rentals', rentals);
 app.use('/api/users', users);
 app.use('/api/auth', auth);
+
+app.use(error);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
