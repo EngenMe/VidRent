@@ -4,6 +4,7 @@ const router = express.Router();
 const _ = require('lodash');
 const bcrypt = require('bcrypt');
 const auth = require('../middlewares/auth');
+const admin = require('../middlewares/admin');
 
 router.get('/me', auth, async (req, res) => {
   const user = await User.findById(req.user._id).select('-password');
@@ -23,15 +24,11 @@ router.post('/', async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(user.password, salt);
 
-  try {
-    await user.save();
-    const token = user.generateAuthToken();
-    res
-      .header('x-auth-token', token)
-      .send(_.pick(user, ['_id', 'name', 'email']));
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
+  await user.save();
+  const token = user.generateAuthToken();
+  res
+    .header('x-auth-token', token)
+    .send(_.pick(user, ['_id', 'name', 'email']));
 });
 
 module.exports = router;

@@ -9,29 +9,23 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:id', async (req, res) => {
-  try {
-    const customer = await Customer.findById(req.params.id);
-    res.send(customer);
-  } catch (err) {
-    res.status(404).send(err.message);
-  }
+  const customer = await Customer.findById(req.params.id);
+  if (!customer)
+    res.status(404).send('The customer with the given ID was not found.');
+
+  res.send(customer);
 });
 
 router.post('/', async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const newCustomer = new Customer(
-    _.pick(req.body, ['name', 'phone', 'isGold'])
-  );
+  const customer = new Customer(_.pick(req.body, ['name', 'phone', 'isGold']));
 
-  try {
-    await newCustomer.validate();
-    await newCustomer.save();
-    res.send(newCustomer);
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
+  await customer.validate();
+  await customer.save();
+
+  res.send(customer);
 });
 
 router.put('/:id', async (req, res) => {
@@ -40,14 +34,9 @@ router.put('/:id', async (req, res) => {
 
   const customer = await Customer.findByIdAndUpdate(
     req.params.id,
-    {
-      name: req.body.name,
-      isGold: req.body.isGold,
-      phone: req.body.phone
-    },
+    _.pick(req.body, ['name', 'isGold', 'phone']),
     { new: true }
   );
-
   if (!customer)
     return res
       .status(404)
@@ -57,18 +46,13 @@ router.put('/:id', async (req, res) => {
 });
 
 router.delete('/:id', async (req, res) => {
-  try {
-    const deletedCustomer = await Customer.findByIdAndDelete(req.params.id);
+  const customer = await Customer.findByIdAndDelete(req.params.id);
+  if (!customer)
+    return res
+      .status(404)
+      .send('The customer with the given ID was not found.');
 
-    if (!deletedCustomer)
-      return res
-        .status(404)
-        .send(`Customer with ID=${req.params.id} not found!`);
-
-    res.send(deletedCustomer);
-  } catch (err) {
-    res.status(404).send(err.message);
-  }
+  res.send(customer);
 });
 
 module.exports = router;

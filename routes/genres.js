@@ -5,11 +5,14 @@ const _ = require('lodash');
 
 router.get('/', async (req, res) => {
   const genres = await Genre.find().sort({ name: 1 });
+
   res.send(genres);
 });
 
 router.get('/:id', async (req, res) => {
   const genre = await Genre.findById(req.params.id);
+  if (!genre) res.status(404).send(err.message);
+
   res.send(genre);
 });
 
@@ -19,42 +22,33 @@ router.post('/', async (req, res) => {
 
   const genre = new Genre(_.pick(req.body, ['name']));
 
-  try {
-    await genre.validate();
-    await genre.save();
-    res.send(genre);
-  } catch (err) {
-    res.status(400).send(err.message);
-  }
+  await genre.validate();
+  await genre.save();
+
+  res.send(genre);
 });
 
 router.put('/:id', async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  try {
-    const updatedGenre = await Genre.findByIdAndUpdate(
-      req.params.id,
-      { name: req.body.name },
-      { new: true }
-    );
-    res.send(updatedGenre);
-  } catch (err) {
-    res.status(404).send(err.message);
-  }
+  const genre = await Genre.findByIdAndUpdate(
+    req.params.id,
+    _.pick(req.body, ['name']),
+    { new: true }
+  );
+  if (!genre)
+    res.status(404).send('The genre with the given ID was not found.');
+
+  res.send(genre);
 });
 
 router.delete('/:id', async (req, res) => {
-  try {
-    const deletedGenre = await Genre.findByIdAndDelete(req.params.id);
+  const genre = await Genre.findByIdAndDelete(req.params.id);
+  if (!genre)
+    res.status(404).send('The genre with the given ID was not found.');
 
-    if (!deletedGenre)
-      return res.status(404).send(`Genre with ID=${req.params.id} not found!`);
-
-    res.send(deletedGenre);
-  } catch (err) {
-    res.status(404).send(err.message);
-  }
+  res.send(genre);
 });
 
 module.exports = router;

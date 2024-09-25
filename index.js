@@ -20,12 +20,17 @@ process.on('uncaughtException', ex => {
   winston.error(ex.message, ex);
 });
 
+process.on('unhandledRejection', ex => {
+  console.log('WE GOT AN PROMISE REJECTION !');
+  winston.error(ex.message, ex);
+});
+
+const p = Promise.reject(new Error('Soemthing failed!'));
+
 if (!config.get('jwtPrivateKey')) {
   console.error('FATAL ERROR: jwtPrivateKey is not defined!');
   process.exit(1);
 }
-
-throw new Error('Something went wrong on starting!');
 
 mongoose
   .connect('mongodb://localhost/vidly')
