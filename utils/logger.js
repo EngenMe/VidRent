@@ -1,7 +1,7 @@
 const winston = require('winston');
 require('winston-mongodb');
 
-module.exports = winston.createLogger({
+const logger = winston.createLogger({
   level: 'error',
   format: winston.format.combine(
     winston.format.timestamp(),
@@ -18,3 +18,14 @@ module.exports = winston.createLogger({
     })
   ]
 });
+
+// Check if we're in development mode, and add a console transport for debugging
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(
+    new winston.transports.Console({
+      format: winston.format.simple()
+    })
+  );
+}
+
+module.exports = logger;

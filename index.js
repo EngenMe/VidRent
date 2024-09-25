@@ -1,5 +1,4 @@
 require('express-async-errors');
-const error = require('./middlewares/error');
 const mongoose = require('mongoose');
 const express = require('express');
 const app = express();
@@ -13,19 +12,18 @@ Joi.objectId = require('joi-objectid')(Joi);
 const users = require('./routes/users');
 const auth = require('./routes/auth');
 const config = require('config');
-const winston = require('winston');
+const error = require('./middlewares/error');
+const logger = require('./utils/logger');
 
 process.on('uncaughtException', ex => {
-  console.log('WE GOT AN UNCAUGHT EXCEPTION !');
-  winston.error(ex.message, ex);
+  logger.error(ex.message, { metadata: ex });
+  process.exit(1);
 });
 
 process.on('unhandledRejection', ex => {
-  console.log('WE GOT AN PROMISE REJECTION !');
-  winston.error(ex.message, ex);
+  logger.error(ex.message, { metadata: ex });
+  process.exit(1);
 });
-
-const p = Promise.reject(new Error('Soemthing failed!'));
 
 if (!config.get('jwtPrivateKey')) {
   console.error('FATAL ERROR: jwtPrivateKey is not defined!');
