@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const _ = require('lodash');
 const validateObjectId = require('../middlewares/validateObjectId');
+const auth = require('../middlewares/auth');
 
 router.get('/', async (req, res) => {
   const customer = await Customer.find().sort({ name: 1 });
@@ -17,7 +18,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
   res.send(customer);
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -29,7 +30,7 @@ router.post('/', async (req, res) => {
   res.send(customer);
 });
 
-router.put('/:id', validateObjectId, async (req, res) => {
+router.put('/:id', auth, validateObjectId, async (req, res) => {
   const { error } = validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -46,7 +47,7 @@ router.put('/:id', validateObjectId, async (req, res) => {
   res.send(customer);
 });
 
-router.delete('/:id', validateObjectId, async (req, res) => {
+router.delete('/:id', auth, validateObjectId, async (req, res) => {
   const customer = await Customer.findByIdAndDelete(req.params.id);
   if (!customer)
     return res

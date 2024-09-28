@@ -88,7 +88,6 @@ describe('/api/genres', () => {
 
     it('should return 400 if genre is more than 100 characters', async () => {
       name = new Array(102).join('a');
-      const token = new User().generateAuthToken();
 
       const res = await exec();
 
@@ -96,8 +95,6 @@ describe('/api/genres', () => {
     });
 
     it('should save genre if it is valid', async () => {
-      const token = new User().generateAuthToken();
-
       await exec();
 
       const genre = await Genre.find({ name: 'genre1' });
@@ -106,8 +103,6 @@ describe('/api/genres', () => {
     });
 
     it('should return the genre if it is valid', async () => {
-      const token = new User().generateAuthToken();
-
       const res = await exec();
 
       expect(res.body).toHaveProperty('_id');

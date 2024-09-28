@@ -9,7 +9,7 @@ const Customer = mongoose.model(
       required: true,
       minlength: 3,
       maxlength: 100,
-      trim: true,
+      trim: true
     },
     phone: {
       type: String,
@@ -18,13 +18,13 @@ const Customer = mongoose.model(
       maxlength: 15,
       match: [
         /^\+?[0-9]{10,15}$/,
-        'Phone number is invalid. It must contain only digits and may start with a +.',
-      ],
+        'Phone number is invalid. It must contain only digits and may start with a +.'
+      ]
     },
     isGold: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   })
 );
 
@@ -38,9 +38,9 @@ function validateCustomer(customer) {
       .required()
       .messages({
         'string.pattern.base':
-          'Phone number is invalid. It must contain only digits and may start with a +.',
+          'Phone number is invalid. It must contain only digits and may start with a +.'
       }),
-    isGold: Joi.boolean(),
+    isGold: Joi.boolean()
   });
 
   return schema.validate(customer);
