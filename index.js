@@ -1,16 +1,9 @@
-const express = require('express');
+const config = require('config');
 
+const app = require('./app');
 const logger = require('./utils/logger');
 
-const app = express();
-
-require('./startup/logging')();
-require('./startup/routes')(app);
-require('./startup/db')();
-require('./startup/config')();
-require('./startup/validation')();
-
-const port = process.env.PORT || 3000;
+const port = config.get('port');
 const server = app.listen(port, () => {
   logger.info(`Listening to port ${port}`);
 });
