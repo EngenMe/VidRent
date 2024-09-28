@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const { Genre } = require('../../../models/genre');
 const { User } = require('../../../models/user');
 
+let server;
 beforeAll(async () => {
   server = await require('../../../index');
 });

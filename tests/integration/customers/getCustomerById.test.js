@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const { Customer } = require('../../../models/customer');
 
+let server;
 beforeAll(async () => {
   server = await require('../../../index');
 });

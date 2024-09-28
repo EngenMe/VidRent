@@ -3,6 +3,7 @@ const request = require('supertest');
 const { User } = require('../../../models/user');
 const { Customer } = require('../../../models/customer');
 
+let server;
 beforeAll(async () => {
   server = await require('../../../index');
 });

@@ -3,6 +3,7 @@ const request = require('supertest');
 const { Genre } = require('../../../models/genre');
 const { User } = require('../../../models/user');
 
+let server;
 beforeAll(async () => {
   server = await require('../../../index');
 });
@@ -32,14 +33,14 @@ describe('POST /', () => {
     expect(res.status).toBe(401);
   });
 
-  it('should return 400 if genre is less than 3 characters', async () => {
+  it('should return 400 if genre name is less than 3 characters', async () => {
     name = '12';
     const res = await exec();
 
     expect(res.status).toBe(400);
   });
 
-  it('should return 400 if genre is more than 100 characters', async () => {
+  it('should return 400 if genre name is more than 100 characters', async () => {
     name = new Array(102).join('a');
 
     const res = await exec();
