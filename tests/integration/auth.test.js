@@ -7,15 +7,14 @@ let server;
 describe('auth middleware', () => {
   let token;
   beforeAll(async () => {
-    server = require('../../index');
-    await Genre.deleteMany({});
+    server = await require('../../index');
   });
   afterAll(async () => {
     await server.close();
     await Genre.deleteMany({});
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     token = new User().generateAuthToken();
   });
 

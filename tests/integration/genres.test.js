@@ -7,8 +7,7 @@ const { User } = require('../../models/user');
 let server;
 describe('/api/genres', () => {
   beforeAll(async () => {
-    server = require('../../index');
-    await Genre.deleteMany({});
+    server = await require('../../index');
   });
   afterAll(async () => {
     await server.close();
