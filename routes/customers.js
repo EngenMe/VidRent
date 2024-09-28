@@ -4,6 +4,7 @@ const router = express.Router();
 const _ = require('lodash');
 const validateObjectId = require('../middlewares/validateObjectId');
 const auth = require('../middlewares/auth');
+const admin = require('../middlewares/admin');
 
 router.get('/', async (req, res) => {
   const customer = await Customer.find().sort({ name: 1 });
@@ -47,7 +48,7 @@ router.put('/:id', auth, validateObjectId, async (req, res) => {
   res.send(customer);
 });
 
-router.delete('/:id', auth, validateObjectId, async (req, res) => {
+router.delete('/:id', auth, admin, validateObjectId, async (req, res) => {
   const customer = await Customer.findByIdAndDelete(req.params.id);
   if (!customer)
     return res
