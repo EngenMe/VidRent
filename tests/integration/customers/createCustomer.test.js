@@ -16,6 +16,7 @@ describe('POST /', () => {
   let token;
   let name;
   let phone;
+
   const exec = () => {
     return request(server)
       .post('/api/customers')
@@ -72,18 +73,17 @@ describe('POST /', () => {
   it('should save customer if it is valid', async () => {
     await exec();
 
-    const customer = await Customer.find({
-      name: 'customer1'
-    });
+    const customer = await Customer.findOne({ name, phone });
 
-    expect(customer).not.toBeNull();
+    expect(customer.name).toBe(name);
+    expect(customer.phone).toBe(phone);
   });
 
   it('should return the customer if it is valid', async () => {
     const res = await exec();
 
     expect(res.body).toHaveProperty('_id');
-    expect(res.body).toHaveProperty('name', 'customer1');
-    expect(res.body).toHaveProperty('phone', '+1234567890');
+    expect(res.body).toHaveProperty('name', name);
+    expect(res.body).toHaveProperty('phone', phone);
   });
 });

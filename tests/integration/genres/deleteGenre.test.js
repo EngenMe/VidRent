@@ -18,6 +18,7 @@ describe('DELETE /:id', () => {
   let genre;
   let id;
   let user;
+  let name = 'genre1';
 
   const exec = () => {
     return request(server)
@@ -27,9 +28,7 @@ describe('DELETE /:id', () => {
   };
 
   beforeEach(async () => {
-    genre = new Genre({
-      name: 'genre1'
-    });
+    genre = new Genre({ name });
     await genre.save();
 
     id = genre._id;
@@ -92,7 +91,7 @@ describe('DELETE /:id', () => {
     expect(res.status).toBe(401);
 
     const genreInDb = await Genre.findById(id);
-    expect(genreInDb).not.toBeNull();
+    expect(genreInDb.name).toBe(name);
   });
 
   it('should return 403 if the user does not have delete permissions', async () => {

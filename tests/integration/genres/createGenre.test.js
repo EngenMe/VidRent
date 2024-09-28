@@ -51,9 +51,9 @@ describe('POST /', () => {
   it('should save genre if it is valid', async () => {
     await exec();
 
-    const genre = await Genre.find({ name: 'genre1' });
+    const genre = await Genre.findOne({ name });
 
-    expect(genre).not.toBeNull();
+    expect(genre.name).toBe(name);
   });
 
   it('should return the genre if it is valid', async () => {

@@ -18,6 +18,8 @@ describe('DELETE /:id', () => {
   let customer;
   let id;
   let user;
+  let name = 'customer1';
+  let phone = '+1234567890';
 
   const exec = () => {
     return request(server)
@@ -28,8 +30,8 @@ describe('DELETE /:id', () => {
 
   beforeEach(async () => {
     customer = new Customer({
-      name: 'customer1',
-      phone: '+1234567890'
+      name,
+      phone
     });
     await customer.save();
 
@@ -95,7 +97,8 @@ describe('DELETE /:id', () => {
     expect(res.status).toBe(401);
 
     const customerInDb = await Customer.findById(id);
-    expect(customerInDb).not.toBeNull();
+    expect(customerInDb.name).toBe(name);
+    expect(customerInDb.phone).toBe(phone);
   });
 
   it('should return 403 if the user does not have delete permissions', async () => {
