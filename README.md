@@ -4,11 +4,6 @@
 
 VidRent is a RESTful API for managing video rentals, built with Node.js and Express. This system allows you to manage customers, genres, movies, rentals, and users with full CRUD functionality, authentication, and authorization.
 
-  <img src="./img/MainScreen1.png" alt="Image 1" width="700" height="400" style="display: inline-block;"/>
-<div>
-  <img src="./img/MainScreen2.png" alt="Image 2" width="700" height="400" style="display: inline-block;"/>
-</div>
-
 ## Table of Contents
 
 - Features
