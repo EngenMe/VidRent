@@ -60,7 +60,7 @@ const Rental = mongoose.model(
     rentalFee: {
       type: Number,
       min: 0,
-      max: 100000
+      max: 100_000
     }
   })
 );
@@ -68,7 +68,8 @@ const Rental = mongoose.model(
 function validateRental(rental) {
   const schema = Joi.object({
     customerId: Joi.objectId().required(),
-    movieId: Joi.objectId().required()
+    movieId: Joi.objectId().required(),
+    rentalFee: Joi.number().min(0).max(100000)
   });
 
   return schema.validate(rental);
