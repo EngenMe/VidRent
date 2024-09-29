@@ -12,7 +12,7 @@ const Rental = mongoose.model(
           minlength: 3,
           maxlength: 100,
           trim: true,
-          unique: true,
+          unique: true
         },
         phone: {
           type: String,
@@ -21,15 +21,15 @@ const Rental = mongoose.model(
           maxlength: 15,
           match: [
             /^\+?[0-9]{10,15}$/,
-            'Phone number is invalid. It must contain only digits and may start with a +.',
-          ],
+            'Phone number is invalid. It must contain only digits and may start with a +.'
+          ]
         },
         isGold: {
           type: Boolean,
-          default: false,
-        },
+          default: false
+        }
       }),
-      required: true,
+      required: true
     },
     movie: {
       type: new mongoose.Schema({
@@ -38,37 +38,37 @@ const Rental = mongoose.model(
           required: true,
           minlength: 5,
           maxlength: 255,
-          trim: true,
+          trim: true
         },
         dailyRentalRate: {
           type: Number,
           min: 0,
           max: 255,
-          required: true,
-        },
+          required: true
+        }
       }),
-      required: true,
+      required: true
     },
     dateOut: {
       type: Date,
       required: true,
-      default: Date.now,
+      default: Date.now
     },
     dateReturned: {
-      type: Date,
+      type: Date
     },
     rentalFee: {
       type: Number,
       min: 0,
-      max: 100000,
-    },
+      max: 100000
+    }
   })
 );
 
 function validateRental(rental) {
   const schema = Joi.object({
     customerId: Joi.objectId().required(),
-    movieId: Joi.objectId().required(),
+    movieId: Joi.objectId().required()
   });
 
   return schema.validate(rental);
