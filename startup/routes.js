@@ -1,6 +1,5 @@
 const express = require('express');
 
-const auth = require('../routes/auth');
 const customers = require('../routes/customers');
 const error = require('../middlewares/error');
 const genres = require('../routes/genres');
@@ -16,7 +15,6 @@ module.exports = function (app) {
   app.use('/api/movies', movies);
   app.use('/api/rentals', rentals);
   app.use('/api/users', users);
-  app.use('/api/auth', auth);
 
   app.use(error);
 };
