@@ -5,6 +5,7 @@ const _ = require('lodash');
 const validateObjectId = require('../middlewares/validateObjectId');
 const auth = require('../middlewares/auth');
 const admin = require('../middlewares/admin');
+const validateBody = require('../middlewares/validate');
 
 router.get('/', async (req, res) => {
   const customer = await Customer.find().sort({ name: 1 });
@@ -19,10 +20,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
   res.send(customer);
 });
 
-router.post('/', auth, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post('/', [auth, validateBody(validate)], async (req, res) => {
   const customer = new Customer(_.pick(req.body, ['name', 'phone', 'isGold']));
 
   await customer.validate();
@@ -31,22 +29,23 @@ router.post('/', auth, async (req, res) => {
   res.send(customer);
 });
 
-router.put('/:id', auth, validateObjectId, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+router.put(
+  '/:id',
+  [auth, validateObjectId, validateBody(validate)],
+  async (req, res) => {
+    const customer = await Customer.findByIdAndUpdate(
+      req.params.id,
+      _.pick(req.body, ['name', 'isGold', 'phone']),
+      { new: true }
+    );
+    if (!customer)
+      return res
+        .status(404)
+        .send('The customer with the given ID was not found.');
 
-  const customer = await Customer.findByIdAndUpdate(
-    req.params.id,
-    _.pick(req.body, ['name', 'isGold', 'phone']),
-    { new: true }
-  );
-  if (!customer)
-    return res
-      .status(404)
-      .send('The customer with the given ID was not found.');
-
-  res.send(customer);
-});
+    res.send(customer);
+  }
+);
 
 router.delete('/:id', auth, admin, validateObjectId, async (req, res) => {
   const customer = await Customer.findByIdAndDelete(req.params.id);

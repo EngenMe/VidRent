@@ -4,6 +4,7 @@ const Fawn = require('fawn');
 const _ = require('lodash');
 const validateObjectId = require('../middlewares/validateObjectId');
 const auth = require('../middlewares/auth');
+const validateBody = require('../middlewares/validate');
 
 const { Rental, validate } = require('../models/rental');
 const { Customer } = require('../models/customer');
@@ -23,10 +24,7 @@ router.get('/:id', validateObjectId, async (req, res) => {
   res.send(rental);
 });
 
-router.post('/', auth, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
-
+router.post('/', [auth, validateBody(validate)], async (req, res) => {
   const customer = await Customer.findById(req.body.customerId);
   if (!customer) return res.status(404).send('Invalid customer.');
 

@@ -6,7 +6,7 @@ const _ = require('lodash');
 const auth = require('../middlewares/auth');
 const admin = require('../middlewares/admin');
 const validateObjectId = require('../middlewares/validateObjectId');
-const mongoose = require('mongoose');
+const validateBody = require('../middlewares/validate');
 
 router.get('/', async (req, res) => {
   const movies = await Movie.find().sort({ title: 1 });
@@ -42,25 +42,26 @@ router.post('/', auth, async (req, res) => {
   res.send(movie);
 });
 
-router.put('/:id', auth, validateObjectId, async (req, res) => {
-  const { error } = validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+router.put(
+  '/:id',
+  [auth, validateObjectId, validateBody(validate)],
+  async (req, res) => {
+    const genre = await Genre.findById(req.body.genreId);
+    if (!genre) return res.status(404).send('Invalid Genre.');
 
-  const genre = await Genre.findById(req.body.genreId);
-  if (!genre) return res.status(404).send('Invalid Genre.');
+    const updateData = {
+      ..._.pick(req.body, ['title', 'numberInStock', 'dailyRentalRate']),
+      genre: { _id: genre._id, name: genre.name }
+    };
+    const movie = await Movie.findByIdAndUpdate(req.params.id, updateData, {
+      new: true
+    });
+    if (!movie)
+      return res.status(404).send('Movie with the given ID was not found.');
 
-  const updateData = {
-    ..._.pick(req.body, ['title', 'numberInStock', 'dailyRentalRate']),
-    genre: { _id: genre._id, name: genre.name }
-  };
-  const movie = await Movie.findByIdAndUpdate(req.params.id, updateData, {
-    new: true
-  });
-  if (!movie)
-    return res.status(404).send('Movie with the given ID was not found.');
-
-  res.send(movie);
-});
+    res.send(movie);
+  }
+);
 
 router.delete('/:id', auth, admin, validateObjectId, async (req, res) => {
   const movie = await Movie.findByIdAndDelete(req.params.id);
