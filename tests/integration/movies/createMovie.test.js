@@ -78,6 +78,22 @@ describe('POST /', () => {
     expect(res.status).toBe(400);
   });
 
+  it('should return 400 if daily rental rate is less than 0', async () => {
+    dailyRentalRate = -1;
+
+    const res = await exec();
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 400 if daily rental rate is more than 255', async () => {
+    dailyRentalRate = 256;
+
+    const res = await exec();
+
+    expect(res.status).toBe(400);
+  });
+
   it('should save movie if it is valid', async () => {
     await exec();
 

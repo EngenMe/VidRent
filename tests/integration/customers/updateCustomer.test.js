@@ -98,7 +98,6 @@ describe('PUT /:id', () => {
 
     const updatedCustomer = await Customer.findById(customer._id);
 
-    expect(updatedCustomer).toBeTruthy();
     expect(updatedCustomer.name).toBe(newName);
     expect(updatedCustomer.phone).toBe(newPhone);
   });

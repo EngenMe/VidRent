@@ -46,7 +46,7 @@ router.put('/:id', auth, validateObjectId, async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const genre = await Genre.findById(req.body.genreId);
-  if (!genre) return res.status(400).send('Invalid Genre.');
+  if (!genre) return res.status(404).send('Invalid Genre.');
 
   const updateData = {
     ..._.pick(req.body, ['title', 'genre', 'numberInStock', 'dailyRentalRate']),
