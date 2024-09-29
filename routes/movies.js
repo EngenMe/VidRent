@@ -6,6 +6,7 @@ const _ = require('lodash');
 const auth = require('../middlewares/auth');
 const admin = require('../middlewares/admin');
 const validateObjectId = require('../middlewares/validateObjectId');
+const mongoose = require('mongoose');
 
 router.get('/', async (req, res) => {
   const movies = await Movie.find().sort({ title: 1 });
@@ -25,7 +26,7 @@ router.post('/', auth, async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   const genre = await Genre.findById(req.body.genreId);
-  if (!genre) return res.status(400).send('Invalid Genre.');
+  if (!genre) return res.status(404).send('Invalid Genre.');
 
   const movie = new Movie({
     ..._.pick(req.body, ['title', 'numberInStock', 'dailyRentalRate']),
@@ -49,7 +50,7 @@ router.put('/:id', auth, validateObjectId, async (req, res) => {
   if (!genre) return res.status(404).send('Invalid Genre.');
 
   const updateData = {
-    ..._.pick(req.body, ['title', 'genre', 'numberInStock', 'dailyRentalRate']),
+    ..._.pick(req.body, ['title', 'numberInStock', 'dailyRentalRate']),
     genre: { _id: genre._id, name: genre.name }
   };
   const movie = await Movie.findByIdAndUpdate(req.params.id, updateData, {

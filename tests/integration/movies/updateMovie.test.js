@@ -18,7 +18,7 @@ afterAll(async () => {
 describe('PUT /:id', () => {
   let token;
   let newTitle;
-  let newGenre;
+  let genreId;
   let newNumberInStock;
   let newDailyRentalRate;
   let movie;
@@ -31,7 +31,7 @@ describe('PUT /:id', () => {
       .set('x-auth-token', token)
       .send({
         title: newTitle,
-        genreId: newGenre._id,
+        genreId,
         numberInStock: newNumberInStock,
         dailyRentalRate: newDailyRentalRate
       });
@@ -49,10 +49,11 @@ describe('PUT /:id', () => {
     await movie.save();
 
     id = movie._id;
+    genreId = genre._id;
     token = new User().generateAuthToken();
 
     newTitle = 'updatedMovie';
-    newGenre = await Genre.findByIdAndUpdate(
+    genre = await Genre.findByIdAndUpdate(
       genre._id,
       { name: 'updatedGenre' },
       { new: true }
@@ -133,14 +134,30 @@ describe('PUT /:id', () => {
     expect(res.status).toBe(404);
   });
 
+  it('should return 404 if genre id is invalid', async () => {
+    genreId = '1';
+
+    const res = await exec();
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 404 if no genre with the given id exists', async () => {
+    genreId = new mongoose.Types.ObjectId();
+
+    const res = await exec();
+
+    expect(res.status).toBe(404);
+  });
+
   it('should update the movie if input is valid', async () => {
     await exec();
 
     const updatedMovie = await Movie.findById(movie._id);
 
     expect(updatedMovie.title).toBe(newTitle);
-    expect(updatedMovie.genre._id).toEqual(newGenre._id);
-    expect(updatedMovie.genre.name).toBe(newGenre.name);
+    expect(updatedMovie.genre._id).toEqual(genre._id);
+    expect(updatedMovie.genre.name).toBe(genre.name);
     expect(updatedMovie.numberInStock).toEqual(newNumberInStock);
     expect(updatedMovie.dailyRentalRate).toEqual(newDailyRentalRate);
   });
@@ -150,8 +167,8 @@ describe('PUT /:id', () => {
 
     expect(res.body).toHaveProperty('_id', movie._id.toHexString());
     expect(res.body).toHaveProperty('title', newTitle);
-    expect(res.body.genre).toHaveProperty('_id', newGenre._id.toHexString());
-    expect(res.body.genre).toHaveProperty('name', newGenre.name);
+    expect(res.body.genre).toHaveProperty('_id', genre._id.toHexString());
+    expect(res.body.genre).toHaveProperty('name', genre.name);
     expect(res.body).toHaveProperty('numberInStock', newNumberInStock);
     expect(res.body).toHaveProperty('dailyRentalRate', newDailyRentalRate);
   });

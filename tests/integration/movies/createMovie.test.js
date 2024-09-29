@@ -1,4 +1,5 @@
 const request = require('supertest');
+const mongoose = require('mongoose');
 
 const { User } = require('../../../models/user');
 const { Movie } = require('../../../models/movie');
@@ -17,6 +18,7 @@ afterAll(async () => {
 describe('POST /', () => {
   let token;
   let title;
+  let genreId;
   let genre;
   let numberInStock;
   let dailyRentalRate;
@@ -24,7 +26,7 @@ describe('POST /', () => {
   const exec = () => {
     return request(server).post('/api/movies').set('x-auth-token', token).send({
       title,
-      genreId: genre._id,
+      genreId: genreId,
       numberInStock,
       dailyRentalRate
     });
@@ -35,6 +37,7 @@ describe('POST /', () => {
     title = 'movie1';
     genre = new Genre({ name: 'genre1' });
     await genre.save();
+    genreId = genre._id;
     numberInStock = 1;
     dailyRentalRate = 1;
   });
@@ -92,6 +95,22 @@ describe('POST /', () => {
     const res = await exec();
 
     expect(res.status).toBe(400);
+  });
+
+  it('should return 400 if genre id is invalid', async () => {
+    genreId = '1';
+
+    const res = await exec();
+
+    expect(res.status).toBe(400);
+  });
+
+  it('should return 404 if no genre with the given id exists', async () => {
+    genreId = new mongoose.Types.ObjectId();
+
+    const res = await exec();
+
+    expect(res.status).toBe(404);
   });
 
   it('should save movie if it is valid', async () => {
